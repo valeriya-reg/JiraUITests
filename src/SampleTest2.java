@@ -12,7 +12,7 @@ public class SampleTest2 {
   @BeforeTest
   public void setUp() {
     // Fix for - The path to the driver executable must be set by the webdriver.chrome.driver system property
-    System.setProperty("webdriver.chrome.driver", "/Users/apiliuk/Downloads/polymorphismSample/chromedriver");
+    System.setProperty("webdriver.chrome.driver", "chromedriver77");
     // Create a new instance of the Firefox driver
     this.driver = new ChromeDriver();
   }
