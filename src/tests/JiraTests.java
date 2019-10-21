@@ -1,12 +1,13 @@
 package tests;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.LoginPage;
+
+import java.util.concurrent.TimeUnit;
 
 public class JiraTests extends BaseTest{
 
@@ -37,43 +38,68 @@ public class JiraTests extends BaseTest{
 
         WebDriverWait wait = new WebDriverWait(driver, 20);
 
-        System.out.println("Test 1");
-
         LoginPage loginPage = new LoginPage(driver);
         loginPage.navigate();
         loginPage.loginToJira("Valeria_Regrut", "Valeria_Regrut");
 
-        driver.findElement(createIssueButton).click();
-        Thread.sleep(3000);
+        click(createIssueButton, 3, 3);
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(projectInput));
+        enterText(projectInput, "QAAUTO-8", 3, 3);
 
-//        driver.findElement(projectInput).sendKeys("QAAUTO-8", Keys.RETURN);
-//        Thread.sleep(3000);
-//        wait.until(ExpectedConditions.visibilityOfElementLocated(issueTypeInput));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(issueTypeInput));
+        enterText(issueTypeInput, "Task", 3, 3);
 
-//        driver.findElement(issueTypeInput).clear();
-//        driver.findElement(issueTypeInput).sendKeys("Task", Keys.RETURN);
-//        Thread.sleep(3000);
-//        wait.until(ExpectedConditions.visibilityOfElementLocated(summaryInput));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(summaryInput));
+        enterText(summaryInput, "Auto Test", 3, 3);
 
-        driver.findElement(summaryInput).sendKeys("Auto Test");
-        driver.findElement(dataModeSource).click();
-        driver.findElement(descriptionInput).sendKeys("Auto Test");
+        click(dataModeSource, 3, 3);
 
-        driver.findElement(createButton).click();
-        Thread.sleep(2000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(descriptionInput));
+        enterText(descriptionInput, "Auto Test", 3, 3);
+
+        click(createButton, 3, 3);
+        //Thread.sleep(2000);
         wait.until(ExpectedConditions.visibilityOfElementLocated(issueSuccessfullyCreated));
 
         Assert.assertTrue(driver.findElement(issueSuccessfullyCreated).isDisplayed());
     }
 
-//  void clickOnElementWithRetry(By locator) {
-//    try {
-//      WebElement element = this.driver.findElement(locator);
-//      element.click();
-//    } catch (NoSuchElementException | StaleElementReferenceException exception) {
-//      WebElement element = this.driver.findElement(locator);
-//      element.click();
-//    }
-//  }
+    private void click(By element, int retry, int timeoutSeconds) {
+        for (int i = retry; i > 0; i--) {
+            try {
+                System.out.println("Searching element" + element.toString() + ". Retry - " + (retry - i));
+                driver.findElement(element).click();
+                break;
+            } catch (NoSuchElementException | StaleElementReferenceException | ElementNotInteractableException ex) {
+                try {
+                    System.out.println("Searching element" + element.toString() + ". Retry - " + (retry - i));
+                    Thread.sleep(TimeUnit.SECONDS.toMillis(timeoutSeconds));
+                    driver.findElement(element).click();
+                    break;
+                } catch (NoSuchElementException | StaleElementReferenceException | ElementNotInteractableException | InterruptedException ex2) {
+                    continue;
+                }
+            }
+        }
+    }
+
+    private void enterText(By element, String text, int retry, int timeoutSeconds) {
+        for (int i = retry; i > 0; i--) {
+            try {
+                System.out.println("Searching element" + element.toString() + ". Retry - " + (retry - i));
+                driver.findElement(element).sendKeys(text);
+                break;
+            } catch (NoSuchElementException | StaleElementReferenceException | ElementNotInteractableException ex) {
+                try {
+                    System.out.println("Searching element" + element.toString() + ". Retry - " + (retry - i));
+                    Thread.sleep(TimeUnit.SECONDS.toMillis(timeoutSeconds));
+                    driver.findElement(element).sendKeys(text);
+                    break;
+                } catch (NoSuchElementException | StaleElementReferenceException | ElementNotInteractableException | InterruptedException ex2) {
+                    continue;
+                }
+            }
+        }
+    }
 }
